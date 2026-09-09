@@ -8,6 +8,7 @@ from decouple import config # Импортируем для чтения .env
 # Импортируем наши инструменты
 from .tool_calculator import CalculatorTool
 from .tool_websearch import WebSearchTool
+from .tool_sentiment import SentimentAnalyzerTool
 
 class LLMAgent:
     """
@@ -30,6 +31,7 @@ class LLMAgent:
         self.tools = {
             "calculator": CalculatorTool(),
             "web_search": WebSearchTool(),
+            "sentiment_analyzer": SentimentAnalyzerTool(),
         }
         self.conversation_history = []
     
@@ -45,7 +47,8 @@ class LLMAgent:
         Available tools:
         - **calculator**: For any math-related questions (numbers, calculations). Use it with the full expression.
         - **web_search**: For finding any information about the real world (current events, facts, definitions). Use it with the user's question or a clear search query.
-
+        - **sentiment_analyzer**: For analyzing the sentiment (positive/negative/neutral) of any text. Use it with the text to analyze.
+        
         Your response MUST be ONLY a JSON object of the following format.
         If one or more tools are needed to answer, return JSON of this structure:
         {{
