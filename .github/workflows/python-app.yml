@@ -65,6 +65,17 @@ jobs:
     
         # Скачиваем модель, указанную в коде теста
         ollama pull qwen3.5:0.8b
+
+    - name: Verify HuggingFace API Key
+      env:
+        HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+      run: |
+        if [ -z "$HUGGINGFACE_API_KEY" ]; then
+          echo "ERROR: HUGGINGFACE_API_KEY is not set"
+          exit 1
+        else
+          echo "OK: HUGGINGFACE_API_KEY is present"
+        fi
         
     - name: Test SentimentAnalyzerTool with pytest
       working-directory: ./3_1_LLM_agent
