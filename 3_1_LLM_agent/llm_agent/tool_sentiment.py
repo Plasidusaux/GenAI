@@ -8,9 +8,10 @@ from decouple import config
 class SentimentAnalyzerTool:
     """
     Инструмент для анализа тональности текста.
-    Поддерживает два режима:
+    Поддерживает три режима:
     1. Hugging Face API (требуется API-ключ)
     2. Локальная модель через transformers (если установлена)
+    3. Эвристический анализ (fallback)
     """
     
     name = "sentiment_analyzer"
@@ -117,7 +118,7 @@ class SentimentAnalyzerTool:
             
             payload = {"inputs": text[:512]}  # Ограничиваем длину
             
-            response = requests.post(API_URL, headers=headers, json=payload, timeout=10)
+            response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
             response.raise_for_status()
             
             result = response.json()
@@ -152,21 +153,45 @@ class SentimentAnalyzerTool:
         Простой эвристический анализ тональности на основе словарей.
         Используется как fallback, если нет API и локальной модели.
         """
+        # Расширенный словарь позитивных слов (русские + английские)
         positive_words = [
+            # Русские позитивные слова
             "хорошо", "отлично", "прекрасно", "замечательно", "люблю", "нравится",
             "радость", "счастье", "успех", "победа", "позитив", "класс", "супер",
-            "great", "good", "excellent", "amazing", "love", "like", "happy", "win"
+            "великолепно", "восхитительно", "превосходно", "потрясающе", "шикарно",
+            "здорово", "круто", "awesome", "wonderful", "fantastic", "amazing",
+            "love", "like", "happy", "joy", "excellent", "great", "good", "best",
+            "perfect", "beautiful", "nice", "positive", "amazing", "brilliant",
+            "success", "win", "victory", "enjoy", "satisfied", "pleased",
+            "рад", "доволен", "счастлив", "весело", "интересно", "увлекательно",
+            "впечатляюще", "великий", "лучший", "отличный", "прекрасный",
+            "замечательный", "позитивный", "успешный", "победный", "радостный",
+            "веселый", "счастливый", "довольный", "вдохновляющий", "мотивирующий"
         ]
         
+        # Расширенный словарь негативных слов (русские + английские)
         negative_words = [
+            # Русские негативные слова
             "плохо", "ужасно", "отвратительно", "ненавижу", "не нравится", "грусть",
             "печаль", "провал", "поражение", "негатив", "fail", "bad", "terrible",
-            "hate", "sad", "angry", "worst"
+            "hate", "sad", "angry", "worst", "awful", "horrible", "disappointed",
+            "ужасный", "плохой", "худший", "отвратный", "мерзкий", "гадкий",
+            "негативный", "печальный", "грустный", "злой", "расстроен", "разочарован",
+            "обидно", "досадно", "неприятно", "провальный", "убыточный",
+            "problem", "issue", "error", "failure", "mistake", "crisis",
+            "проблема", "ошибка", "кризис", "беда", "катастрофа", "несчастье",
+            "плохой", "ужасный", "отвратительный", "мерзкий", "омерзительный",
+            "неудача", "фиаско", "крах", "провал", "позор", "стыд",
+            "холодно", "жарко", "тяжело", "трудно", "сложно", "больно"
         ]
         
         text_lower = text.lower()
+        
+        # Считаем количество позитивных и негативных слов
         positive_count = sum(1 for word in positive_words if word in text_lower)
         negative_count = sum(1 for word in negative_words if word in text_lower)
+        
+        print(f"> Найдено позитивных слов: {positive_count}, негативных: {negative_count}")
         
         if positive_count > negative_count:
             tone = "позитивная"
