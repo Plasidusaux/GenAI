@@ -6,6 +6,16 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(__file__))
 
+# Сначала определяем вспомогательную функцию
+def _check_transformers_installed():
+    """Проверяет, установлена ли библиотека transformers."""
+    try:
+        import transformers
+        return True
+    except ImportError:
+        return False
+
+# Импортируем инструмент после определения вспомогательной функции
 from llm_agent.tool_sentiment import SentimentAnalyzerTool
 
 
@@ -149,7 +159,7 @@ class TestSentimentAnalyzerToolAPI(unittest.TestCase):
     @patch('llm_agent.tool_sentiment.requests.post')
     def test_api_error(self, mock_post):
         """Тест: ошибка API."""
-        mock_post.side_effect = requests.exceptions.RequestException("API Error")
+        mock_post.side_effect = __import__('requests').exceptions.RequestException("API Error")
         
         result = self.tool.use("Тест")
         self.assertIn("ошибк", result.lower())
@@ -194,15 +204,7 @@ class TestSentimentAnalyzerToolIntegration(unittest.TestCase):
         self.assertIn("позитивн", result.lower())
 
 
-def _check_transformers_installed():
-    """Проверяет, установлена ли библиотека transformers."""
-    try:
-        import transformers
-        return True
-    except ImportError:
-        return False
-
-
+# Функция уже определена выше, но оставляем для явности
 if __name__ == "__main__":
     # Запуск тестов с подробным выводом
     unittest.main(verbosity=2)
