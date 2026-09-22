@@ -77,7 +77,7 @@ jobs:
           echo "OK: HUGGINGFACE_API_KEY is present"
         fi
         
-        - name: Test SentimentAnalyzerTool
+    - name: Test SentimentAnalyzerTool
       working-directory: ./3_1_LLM_agent
       env:
         PYTHONPATH: .
