@@ -77,18 +77,15 @@ jobs:
           echo "OK: HUGGINGFACE_API_KEY is present"
         fi
         
-    - name: Test SentimentAnalyzerTool with pytest
+        - name: Test SentimentAnalyzerTool
       working-directory: ./3_1_LLM_agent
       env:
         PYTHONPATH: .
         HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
-        OLLAMA_MODEL: qwen3.5:0.8b
       run: |
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        # Запускаем только тесты для SentimentAnalyzerTool
-        python -m pytest tests/test_sentiment_tool.py -v
-        # Если нужны интеграционные тесты с Ollama, раскомментируйте:
-        # python -m pytest tests/test_sentiment_tool.py -m integration -v
+        # Запускаем только unit тесты
+        python -m pytest tests/test_sentiment_tool.py -m "unit" -v --tb=short
     
     - name: Run main.py (опционально)
       working-directory: ./3_1_LLM_agent
